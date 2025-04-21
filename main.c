@@ -212,6 +212,152 @@ void voterPortal() {
     }
 }
 
-int main(){
-    
+// Check if voter is registered
+int isVoterRegistered(char *voterId) {
+    FILE *file = fopen(VOTER_REG_FILE, "r");
+    if (file == NULL) {
+        return 0;
+    }
+
+    char id[10];
+    char name[50];
+    while (fscanf(file, " %[^\n]\n%[^\n]\n", name, id) != EOF) {
+        if (strcmp(id, voterId) == 0) {
+            fclose(file);
+            return 1;
+        }
+        // Skip the blank line
+        fgetc(file);
+    }
+
+    fclose(file);
+    return 0;
+}
+
+// Check if voter has already voted
+int hasVoted(char *voterId) {
+    FILE *file = fopen(VOTED_ALREADY_FILE, "r");
+    if (file == NULL) {
+        return 0;
+    }
+
+    char id[10];
+    while (fscanf(file, "%s", id) != EOF) {
+        if (strcmp(id, voterId) == 0) {
+            fclose(file);
+            return 1;
+        }
+    }
+
+    fclose(file);
+    return 0;
+}
+
+// Save vote to file
+void saveVote(char *voterId, char *candidateId) {
+    FILE *file = fopen(VOTED_ALREADY_FILE, "a");
+    if (file == NULL) {
+        printf(">>> ERROR: Failed to open file.\n");
+        return;
+    }
+    fprintf(file, "%s\n", voterId);
+    fclose(file);
+
+    Candidate candidates[50];
+    int candidateCount;
+    loadCandidates(candidates, &candidateCount);
+    loadVotes(candidates, candidateCount);
+
+    for (int i = 0; i < candidateCount; i++) {
+        if (strcmp(candidates[i].id, candidateId) == 0) {
+            candidates[i].votes++;
+            break;
+        }
+    }
+
+    saveVotes(candidates, candidateCount);
+}
+
+// Load candidates from file
+void loadCandidates(Candidate candidates[], int *count) {
+    FILE *file = fopen(CANDIDATE_REG_FILE, "r");
+    if (file == NULL) {
+        *count = 0;
+        return;
+    }
+
+    *count = 0;
+    while (fscanf(file, "%[^,],%[^,],%[^,],%d\n", candidates[*count].name, candidates[*count].id, candidates[*count].position, &candidates[*count].votes) != EOF) {
+        (*count)++;
+    }
+
+    fclose(file);
+}
+
+// Save candidates to file
+void saveCandidates(Candidate candidates[], int count) {
+    FILE *file = fopen(CANDIDATE_REG_FILE, "w");
+    if (file == NULL) {
+        printf(">>> ERROR: Failed to open file.\n");
+        return;
+    }
+
+    for (int i = 0; i < count; i++) {
+        fprintf(file, "%s,%s,%s,%d\n", candidates[i].name, candidates[i].id, candidates[i].position, candidates[i].votes);
+    }
+
+    fclose(file);
+}
+
+// Load votes from file
+void loadVotes(Candidate candidates[], int count) {
+    FILE *file = fopen(CANDIDATE_VOTES_FILE, "r");
+    if (file == NULL) {
+        return;
+    }
+
+    char name[50];
+    int votes;
+    while (fscanf(file, "%[^,],%d\n", name, &votes) != EOF) {
+        for (int i = 0; i < count; i++) {
+            if (strcmp(candidates[i].name, name) == 0) {
+                candidates[i].votes = votes;
+                break;
+            }
+        }
+    }
+
+    fclose(file);
+}
+
+// Save votes to file
+void saveVotes(Candidate candidates[], int count) {
+    FILE *file = fopen(CANDIDATE_VOTES_FILE, "w");
+    if (file == NULL) {
+        printf(">>> ERROR: Failed to open file.\n");
+        return;
+    }
+
+    for (int i = 0; i < count; i++) {
+        fprintf(file, "%s,%d\n", candidates[i].name, candidates[i].votes);
+    }
+
+    fclose(file);
+}
+
+// exit admin portal
+void exitPortal(){
+    char cinCode[10];
+
+    printf("===================================================\n");
+    printf(">>> Enter code to exit portal: ");
+    scanf("%s", cinCode);
+    if(strcmp(cinCode, "exitnn") != 0){
+        printf(">>> Exit denied!\n");
+        return;
+    }
+    else{
+        printf(">>> Exit granted\n");
+        main();
+    }
 }
