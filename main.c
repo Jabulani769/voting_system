@@ -72,6 +72,74 @@ void adminPortal(){
         }
     }    
 }
+
+// Voter Portal
+void voterPortal() {
+    char voterId[10];
+
+    printf("\n===================================================\n");
+    printf("Enter your voter ID: ");
+    scanf("%s", voterId);
+
+    if (!isVoterRegistered(voterId)) {
+        printf(">>> ERROR: You are not registered to vote.\n");
+        return;
+    }
+
+    if (hasVoted(voterId)) {
+        printf(">>> ERROR: You have already voted.\n");
+        return;
+    }
+
+    Candidate candidates[50];
+    int candidateCount;
+    loadCandidates(candidates, &candidateCount);
+    loadVotes(candidates, candidateCount);
+
+        // Assigning unique position identifiers to candidates according to their positions
+        char positions[50][50];
+        int positionCount = 0;
+        for (int i = 0; i < candidateCount; i++) {
+            int isNew = 1;
+            for (int j = 0; j < positionCount; j++) {
+                if (strcmp(candidates[i].position, positions[j]) == 0) {
+                    isNew = 0;
+                    break;
+                }
+            }
+            if (isNew) {
+                strcpy(positions[positionCount], candidates[i].position);
+                positionCount++;
+            }
+        }
+
+        // Displays Role being voted for loops according to number of positions
+        for (int i = 0; i < positionCount; i++) {
+        printf("\n===================================================");
+        printf("\n>>> Voting for %s\n", positions[i]);
+        printf("===================================================\n");
+        // Show candidates for the current position
+        for (int j = 0; j < candidateCount; j++) {
+            if (strcmp(candidates[j].position, positions[i]) == 0) {
+                printf("%s - %s (%s)\n", candidates[j].name, candidates[j].id, candidates[j].position);
+            }
+        }
+
+        // Allow voter to choose a candidate
+        char candidateId[10];
+        printf("\n>>> Enter the ID of the candidate: ");
+        scanf("%s", candidateId);
+        
+        // Save the vote
+        saveVote(voterId, candidateId);
+            
+        
+        printf("\n===================================================");
+        printf("\n>>> Thank you for voting!\n");
+        printf("==================================================\n");
+    }
+}
+
 int main(){
     
 }
