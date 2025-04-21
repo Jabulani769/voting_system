@@ -73,6 +73,78 @@ void adminPortal(){
     }    
 }
 
+// Register Voter
+void registerVoter() {
+    char voterId[10];
+    char voterName[50];
+
+    printf("\n===================================================");
+    printf("\n>>>> ENTER VOTER REGISTRATION DETAILS <<<<\n");
+    printf("===================================================\n");
+    printf("Enter voter name: ");
+    scanf(" %[^\n]", voterName); // Read the full name (including spaces)
+
+    printf("Enter voter ID: ");
+    scanf("%s", voterId);
+
+    FILE *file = fopen(VOTER_REG_FILE, "a");
+    if (file == NULL) {
+        printf(">>> ERROR: Failed to open file.\n");
+        return;
+    }
+
+    // Write voter ID and name to the file
+    fprintf(file, "%s\n%s\n\n", voterName, voterId); // Add a blank line after each voter
+    fclose(file);
+
+    printf(">>> Voter registered successfully.\n");
+}
+
+// Register Candidate
+void registerCandidate() {
+    Candidate candidate;
+
+    printf("\n===================================================\n");
+    printf(">>> Enter Candidate Details <<<\n");
+    printf("===================================================\n");
+    printf("Enter candidate name: ");
+    scanf(" %[^\n]", candidate.name);
+    printf("Enter candidate ID: ");
+    scanf("%s", candidate.id);
+    printf("Enter candidate position: ");
+    scanf(" %[^\n]", candidate.position);
+    candidate.votes = 0;
+
+    FILE *file = fopen(CANDIDATE_REG_FILE, "a");
+    if (file == NULL) {
+        printf(">>> ERROR: Failed to open file.\n");
+        return;
+    }
+
+    fprintf(file, "%s,%s,%s,%d\n", candidate.name, candidate.id, candidate.position, candidate.votes);
+    fclose(file);
+    printf(">>> Candidate registered successfully.\n");
+}
+
+// View Vote Graph
+void viewVoteGraph() {
+    Candidate candidates[50];
+    int candidateCount;
+    loadCandidates(candidates, &candidateCount);
+    loadVotes(candidates, candidateCount);
+
+    printf("\n===================================================");
+    printf("\n>>> Viewing Voting Results <<<\n");
+    printf("===================================================\n");
+    for (int i = 0; i < candidateCount; i++) {
+        printf("%s |", candidates[i].name);
+        for (int j = 0; j < candidates[i].votes; j++) {
+            printf("#");
+        }
+        printf(" %d\n", candidates[i].votes);
+    }
+}
+
 // Voter Portal
 void voterPortal() {
     char voterId[10];
