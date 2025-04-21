@@ -361,3 +361,34 @@ void exitPortal(){
         main();
     }
 }
+
+int main() {
+    int choice;
+    while (1) {
+        printf("\n===================================================");
+        printf("\n>>> Welcome to the Voting System <<<");
+        printf("\n===================================================\n");
+        printf("1. Admin Portal\n");
+        printf("2. Voter Portal\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        if(choice == 00){
+            printf("\n===================================================\n");
+            printf(">>> Voting System Terminated\n");
+            printf("===================================================");
+            exit(0);
+        }
+
+        switch (choice) {
+            case 1:
+                adminPortal();
+                break;
+            case 2:
+                voterPortal();
+                break;
+            default:
+                printf(">>> Invalid choice. Please try again.\n");
+        }
+    }
+    return 0;
+}
